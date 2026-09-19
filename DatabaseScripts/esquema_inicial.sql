@@ -5,6 +5,8 @@
 
 CREATE database e_commerce
 
+USE e_commerce
+
 -- 1. CREACIÓN DE TABLAS
 -- =============================================
 
