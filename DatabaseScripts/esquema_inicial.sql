@@ -126,23 +126,44 @@ GO
 -- Este SP es un ejemplo claro de cómo recuperar datos de forma estructurada.
 -- Las aplicaciones consumirán este SP usando Dapper / ADO.NET.
 
-CREATE PROCEDURE sp_GetAllActiveProducts
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_GetAllActiveProducts]
+    @method varchar(100), 
+    @isActive bit = null
 AS
 BEGIN
     SET NOCOUNT ON;
+    If @method = 'Products'
+    BEGIN
 
-    SELECT 
-        ProductId, 
-        SKU, 
-        Name, 
-        Description, 
-        Price, 
-        StockQuantity 
-    FROM 
-        Products
-    WHERE 
-        IsActive = 1
-    ORDER BY 
-        Name ASC;
+        IF @isActive IS NULL
+        BEGIN
+            SELECT
+                '0' as 'code',
+                'No se ha especificado el parámetro isActive' as 'message'
+            RETURN
+        END
+
+
+
+        SELECT 
+            ProductId, 
+            SKU, 
+            Name, 
+            Description, 
+            Price, 
+            StockQuantity,
+            '1' as 'code',
+            'Success' as 'message'
+        FROM 
+            Products
+        WHERE 
+            IsActive = @isActive
+        ORDER BY 
+            Name ASC;
+    END
 END;
 GO
