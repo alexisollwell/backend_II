@@ -132,7 +132,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 ALTER PROCEDURE [dbo].[sp_GetAllActiveProducts]
     @method varchar(100), 
-    @isActive bit = null
+    @isActive bit = null,
+    @SKU varchar(50) = null
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -162,6 +163,48 @@ BEGIN
             Products
         WHERE 
             IsActive = @isActive
+        ORDER BY 
+            Name ASC;
+    END
+
+    If @method = 'GetProductBySKU'
+    BEGIN
+        IF @SKU IS NULL
+        BEGIN
+            SELECT
+                '0' as 'code',
+                'No se ha especificado el parámetro SKU' as 'message'
+            RETURN
+        END
+
+
+        SELECT 
+            @isActive = IsActive
+        FROM Products
+        WHERE SKU = @SKU
+
+        IF @isActive = 0
+        BEGIN
+            SELECT
+                '0' as 'code',
+                'El producto ya no se encuentra activo' as 'message'
+            RETURN
+        END
+
+        SELECT 
+            ProductId, 
+            SKU, 
+            Name, 
+            Description, 
+            Price, 
+            StockQuantity,
+            '1' as 'code',
+            'Success' as 'message'
+        FROM 
+            Products
+        WHERE 
+            SKU = @SKU
+            AND IsActive = 1
         ORDER BY 
             Name ASC;
     END
